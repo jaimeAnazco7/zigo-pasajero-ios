@@ -1,0 +1,41 @@
+workflows:
+  zigo-pasajero-ios:
+    name: Zigo Pasajero iOS
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.zigotaxi.rider
+      vars:
+        APP_STORE_APPLE_ID: 6786388541
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Prepare secrets file for CI
+        script: |
+          cp lib/utils/secrets.example.dart lib/utils/secrets.dart
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      - name: Get Flutter packages
+        script: |
+          flutter pub get
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios && pod install
+      - name: Flutter build IPA
+        script: |
+          flutter build ipa --release \
+            --export-options-plist=/Users/builder/export_options.plist
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - Internal Testers

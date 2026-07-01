@@ -1,0 +1,123 @@
+name: taxi_booking
+description: A new Flutter project.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 7.0.2+33
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  # TOAST
+  fluttertoast: ^8.2.8
+  # IMAGE
+  cached_network_image: ^3.3.1
+  # BASE
+  intl: ^0.19.0
+  google_fonts: ^6.2.1
+  html: ^0.15.4
+  shared_preferences: ^2.3.2
+  flutter_widget_from_html: ^0.15.2
+  # UI
+  sliding_up_panel: ^2.0.0+1
+  dotted_line: ^3.2.2
+  lottie: ^3.1.2
+  flutter_rating_bar: ^4.0.1
+  flutter_staggered_animations: ^1.1.1
+  bottom_picker: ^2.8.0
+  country_code_picker: ^3.0.0
+  flutter_native_contact_picker: ^0.0.10
+  dotted_border: ^2.1.0
+  timeline_tile: ^2.0.0
+  flutter_vector_icons: ^2.0.0
+  permission_handler: ^11.3.1
+  pinput: ^5.0.0
+  # MAP
+  geolocator: ^10.0.1
+  geocoding: ^3.0.0
+  google_maps_flutter: ^2.9.0
+  flutter_polyline_points:
+    git:
+      url: https://github.com/appmeetmighty/flutter_polyline_points.git
+  # IMAGES
+  image_picker: ^1.1.2
+  file_picker: ^8.0.6
+  # CONNECTIVITY
+  package_info_plus: ^8.0.2
+  # CONNECTIVITY
+  http: ^1.2.2
+  connectivity_plus: ^6.0.5
+  url_launcher: ^6.3.0
+  share_plus: ^10.0.2
+  internet_file: ^1.2.0
+  #FIREBASE
+  firebase_crashlytics: ^4.1.0
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  firebase_storage: ^12.1.1
+  firebase_database: ^11.0.3
+  paginate_firestore: ^1.0.3+1
+  cloud_firestore: ^5.3.0
+  # STATE MANAGEMENT
+  mobx: ^2.3.3+2
+  flutter_mobx: ^2.2.1+1
+  # Payment gateway
+  razorpay_flutter: ^1.3.7
+  flutter_stripe: ^11.0.0
+  flutterwave_standard_smart: ^1.0.4
+  flutter_paytabs_bridge: ^2.6.17
+  my_fatoorah: ^3.3.0
+  flutter_paystack:
+    git:
+      url: https://github.com/appmeetmighty/flutter_paystack.git
+  paytm:
+    git:
+      url: https://github.com/appmeetmighty/Paytm-All-in-one-flutter-sdk.git
+  flutter_braintree_betc:
+    git:
+      url: https://github.com/appmeetmighty/flutter-braintree.git
+  # PUSH NOTIFICATION
+  onesignal_flutter: ^5.2.4
+  # Social Login
+  google_sign_in: ^6.2.1
+  the_apple_sign_in: ^1.1.1
+  # DOWNLOAD INVOICE PDF
+  pdf: ^3.11.1
+  pdfx: 2.6.0
+  path_provider: ^2.1.4
+  open_file: ^3.5.3
+
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  build_runner: ^2.4.11
+  mobx_codegen: ^2.6.1
+  #flutter packages pub run build_runner build --delete-conflicting-outputs
+
+dependency_overrides:
+  meta: ^1.15.0
+  intl: ^0.18.0
+  http: ^0.13.5
+  cloud_firestore: ^5.0.0
+  firebase_core:
+
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - images/
+    - images/app_images/
+    - images/json_files/
+    - images/icons/
+    - staticjson/

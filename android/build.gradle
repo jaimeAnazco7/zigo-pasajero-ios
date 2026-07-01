@@ -1,0 +1,104 @@
+buildscript {
+    ext.kotlin_version = '2.2.0'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.4.2'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+}
+
+// 1. Forzar versión de Kotlin 2.2.0 globalmente
+subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion "2.2.0"
+            }
+        }
+    }
+}
+
+// 2. Fix de Namespace Preventivo y forzado de SDK 35 / Java 17
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                compileSdkVersion 35
+                if (project.android.hasProperty('buildToolsVersion')) {
+                    buildToolsVersion "35.0.0"
+                }
+                
+                // Forzar Java 17 (Requerido por Kotlin 2.2)
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+                
+                // Fix dinámico de Namespace para plugins antiguos
+                if (namespace == null) {
+                    def manifestFile = project.file("src/main/AndroidManifest.xml")
+                    if (manifestFile.exists()) {
+                        try {
+                            def xml = new XmlParser().parse(manifestFile)
+                            namespace = xml.@package
+                        } catch (Exception e) {
+                            // Si falla el parseo, asignar el nombre del proyecto como fallback
+                            namespace = project.group
+                        }
+                    }
+                }
+
+                defaultConfig {
+                    if (targetSdkVersion != null) {
+                        targetSdkVersion 35
+                    }
+                }
+            }
+        }
+    }
+
+    // Asegurar JVM Target 17 en todas las tareas de Kotlin
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+            freeCompilerArgs += ["-Xjvm-default=all"]
+        }
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (namespace == null) {
+                    namespace project.group
+                }
+            }
+        }
+    }
+}
+
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

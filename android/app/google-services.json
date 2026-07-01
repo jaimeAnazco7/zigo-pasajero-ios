@@ -1,0 +1,130 @@
+{
+  "project_info": {
+    "project_number": "596360016418",
+    "firebase_url": "https://zigo-taxi-produccion-default-rtdb.firebaseio.com",
+    "project_id": "zigo-taxi-produccion",
+    "storage_bucket": "zigo-taxi-produccion.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596360016418:android:78d00d0c945189b3e3507b",
+        "android_client_info": {
+          "package_name": "com.mighty.taxidriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596360016418-oi6p3q0m9c5c5r67cvcpsdp0cvb9iml8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOEdpMal83dLG9n27u_mmqz6kpZpb3Zwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596360016418-oi6p3q0m9c5c5r67cvcpsdp0cvb9iml8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596360016418:android:66b0caa3f3b47901e3507b",
+        "android_client_info": {
+          "package_name": "com.mighty.taxirider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596360016418-1fn9pmikbaukak02ldfuesohv060b0us.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mighty.taxirider",
+            "certificate_hash": "ca0ef759392d76ba94eb0a4efc8fe8b16ed06cd7"
+          }
+        },
+        {
+          "client_id": "596360016418-rd2ihble85fi0t5f40ldlj970bdabtpm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mighty.taxirider",
+            "certificate_hash": "626d3035761889f77fa08500111772f18d7fed54"
+          }
+        },
+        {
+          "client_id": "596360016418-oi6p3q0m9c5c5r67cvcpsdp0cvb9iml8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOEdpMal83dLG9n27u_mmqz6kpZpb3Zwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596360016418-oi6p3q0m9c5c5r67cvcpsdp0cvb9iml8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596360016418:android:907ad32295af8dfbe3507b",
+        "android_client_info": {
+          "package_name": "com.zigotaxi.rider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596360016418-op5gsjhm5l7c63ue0l30e8l86i38tgf7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zigotaxi.rider",
+            "certificate_hash": "ca0ef759392d76ba94eb0a4efc8fe8b16ed06cd7"
+          }
+        },
+        {
+          "client_id": "596360016418-vles4n5k114dkpqodcaiqrirra9lpt9k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zigotaxi.rider",
+            "certificate_hash": "626d3035761889f77fa08500111772f18d7fed54"
+          }
+        },
+        {
+          "client_id": "596360016418-oi6p3q0m9c5c5r67cvcpsdp0cvb9iml8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOEdpMal83dLG9n27u_mmqz6kpZpb3Zwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596360016418-oi6p3q0m9c5c5r67cvcpsdp0cvb9iml8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

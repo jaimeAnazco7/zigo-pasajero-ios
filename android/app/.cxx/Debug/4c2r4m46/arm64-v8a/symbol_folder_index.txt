@@ -1,0 +1,1 @@
+D:\xampp\htdocs\proyecto_mighty_taxi\MightyTaxiSourceCode\Rider-17\build\app\intermediates\cxx\Debug\4c2r4m46\obj\arm64-v8a

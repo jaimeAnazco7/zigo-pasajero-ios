@@ -1,0 +1,2 @@
+D:/xampp/htdocs/proyecto_mighty_taxi/MightyTaxiSourceCode/Rider-17/android/app/.cxx/RelWithDebInfo/643p1lx6/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/xampp/htdocs/proyecto_mighty_taxi/MightyTaxiSourceCode/Rider-17/android/app/.cxx/RelWithDebInfo/643p1lx6/arm64-v8a/CMakeFiles/rebuild_cache.dir

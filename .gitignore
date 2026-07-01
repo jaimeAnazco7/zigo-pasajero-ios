@@ -1,0 +1,19 @@
+/android/key.properties
+/android/local.properties
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/pubspec.lock
+/build/
+/android/app/.cxx/
+/android/nul
+/.idea/
+# Copias accidentales / capturas
+android/app/google-services.json___*
+android/app/google-services.jsonaaa
+/flutter_*.png
+/.dart_tool/
+# Documentación privada - ignorar todos los .md excepto README.md
+*.md
+!README.md
+!ios/**/*.md
+/lib/utils/secrets.dart
