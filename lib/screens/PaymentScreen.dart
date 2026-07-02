@@ -14,7 +14,6 @@ import 'package:flutterwave_standard_smart/flutterwave.dart';
 import 'package:flutterwave_standard_smart/view/view_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_fatoorah/my_fatoorah.dart';
-import 'package:paytm/paytm.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../main.dart';
@@ -54,9 +53,7 @@ class PaymentScreenState extends State<PaymentScreen> {
       payTabsProfileId,
       payTabsServerKey,
       payTabsClientKey,
-      myFatoorahToken,
-      paytmMerchantId,
-      paytmMerchantKey;
+      myFatoorahToken;
 
   String? razorKey;
   bool isTestType = true;
@@ -121,9 +118,6 @@ class PaymentScreenState extends State<PaymentScreen> {
             payTabsServerKey = element.isTest == 1 ? element.testValue!.serverKey : element.liveValue!.serverKey;
           } else if (element.type == PAYMENT_TYPE_MYFATOORAH) {
             myFatoorahToken = element.isTest == 1 ? element.testValue!.accessToken : element.liveValue!.accessToken;
-          } else if (element.type == PAYMENT_TYPE_PAYTM) {
-            paytmMerchantId = element.isTest == 1 ? element.testValue!.merchantId : element.liveValue!.merchantId;
-            paytmMerchantKey = element.isTest == 1 ? element.testValue!.merchantKey : element.liveValue!.merchantKey;
           }
         });
       }
@@ -482,68 +476,6 @@ class PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  /// PayTm Payment
-  void paytmPayment() async {
-    setState(() {
-      loading = true;
-    });
-
-    String orderId = DateTime.now().millisecondsSinceEpoch.toString();
-
-    String callBackUrl = (isTestType ? 'https://securegw-stage.paytm.in' : 'https://securegw.paytm.in') + '/theia/paytmCallback?ORDER_ID=' + orderId;
-
-    var url = 'https://desolate-anchorage-29312.herokuapp.com/generateTxnToken';
-
-    var body = json.encode({
-      "mid": paytmMerchantId,
-      "key_secret": paytmMerchantKey,
-      "website": isTestType ? "WEBSTAGING" : "DEFAULT",
-      "orderId": orderId,
-      "amount": widget.amount.toString(),
-      "callbackUrl": callBackUrl,
-      "custId": sharedPref.getInt(USER_ID).toString(),
-      "testing": isTestType ? 0 : 1
-    });
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        body: body,
-        headers: {'Content-type': "application/json"},
-      );
-
-      String txnToken = response.body;
-
-      var paytmResponse = Paytm.payWithPaytm(
-        mId: paytmMerchantId!,
-        orderId: orderId,
-        txnToken: txnToken,
-        txnAmount: widget.amount.toString(),
-        callBackUrl: callBackUrl,
-        staging: isTestType,
-        appInvokeEnabled: false,
-      );
-
-      paytmResponse.then((value) {
-        setState(() {
-          loading = false;
-          if (value['error']) {
-            toast(language.transactionFailed);
-          } else {
-            if (value['response'] != null) {
-              toast(language.transactionSuccessful);
-              if (value['response']['STATUS'] == 'TXN_SUCCESS') {
-                paymentConfirm();
-              }
-            }
-          }
-        });
-      });
-    } catch (e) {
-      log(e);
-    }
-  }
-
   @override
   void setState(fn) {
     if (mounted) super.setState(fn);
@@ -626,8 +558,6 @@ class PaymentScreenState extends State<PaymentScreen> {
                 // mercadoPagoPayment();
               } else if (selectedPaymentType == PAYMENT_TYPE_MYFATOORAH) {
                 myFatoorahPayment();
-              } else if (selectedPaymentType == PAYMENT_TYPE_PAYTM) {
-                paytmPayment();
               }
             },
           ),

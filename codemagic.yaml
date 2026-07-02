@@ -29,12 +29,6 @@ workflows:
           cd ios
           rm -rf Pods Podfile.lock
           pod install --repo-update
-      - name: Strip bitcode from Paytm SDK before signing
-        script: |
-          find ios -path '*AppInvokeSDK.framework/AppInvokeSDK' -type f | while read -r bin; do
-            echo "Stripping bitcode from $bin"
-            xcrun bitcode_strip "$bin" -r -o "$bin" || true
-          done
       - name: Flutter build IPA
         script: |
           flutter build ipa --release \

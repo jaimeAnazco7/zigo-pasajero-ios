@@ -75,9 +75,6 @@ dependencies:
   flutter_paystack:
     git:
       url: https://github.com/appmeetmighty/flutter_paystack.git
-  paytm:
-    git:
-      url: https://github.com/appmeetmighty/Paytm-All-in-one-flutter-sdk.git
   # PUSH NOTIFICATION
   onesignal_flutter: ^5.2.4
   # Social Login
