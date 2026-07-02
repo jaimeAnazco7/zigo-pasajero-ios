@@ -33,6 +33,30 @@ workflows:
         script: |
           flutter build ipa --release \
             --export-options-plist=/Users/builder/export_options.plist
+      - name: Strip bitcode from IPA (Paytm AppInvokeSDK)
+        script: |
+          set -e
+          IPA_PATH=$(find build/ios/ipa -name "*.ipa" | head -1)
+          if [ -z "$IPA_PATH" ]; then
+            echo "No IPA found"
+            exit 1
+          fi
+          ABS_IPA="$(cd "$(dirname "$IPA_PATH")" && pwd)/$(basename "$IPA_PATH")"
+          WORK_DIR=$(mktemp -d)
+          echo "Stripping bitcode in $ABS_IPA"
+          unzip -q "$ABS_IPA" -d "$WORK_DIR"
+          find "$WORK_DIR" -name '*.framework' -type d | while read -r FRAMEWORK; do
+            EXEC_NAME=$(defaults read "$FRAMEWORK/Info.plist" CFBundleExecutable 2>/dev/null || basename "$FRAMEWORK" .framework)
+            EXEC_PATH="$FRAMEWORK/$EXEC_NAME"
+            if [ -f "$EXEC_PATH" ]; then
+              echo "Stripping bitcode from $EXEC_PATH"
+              xcrun bitcode_strip "$EXEC_PATH" -r -o "$EXEC_PATH" || true
+            fi
+          done
+          rm -f "$ABS_IPA"
+          (cd "$WORK_DIR" && zip -qr "$ABS_IPA" Payload)
+          rm -rf "$WORK_DIR"
+          echo "Bitcode strip complete"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
