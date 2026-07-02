@@ -51,4 +51,12 @@ post_install do |installer|
       config.build_settings['OTHER_CFLAGS'] << '-Wno-deprecated-declarations'
     end
   end
+
+  bitcode_strip = `xcrun --find bitcode_strip 2>/dev/null`.strip
+  unless bitcode_strip.empty?
+    Dir.glob(File.join(__dir__, '**', 'AppInvokeSDK.framework', 'AppInvokeSDK')).each do |binary|
+      puts "Stripping bitcode from #{binary}"
+      system(bitcode_strip, '-r', '-o', binary, binary)
+    end
+  end
 end
