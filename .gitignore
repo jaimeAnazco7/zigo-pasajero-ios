@@ -12,6 +12,8 @@ android/app/google-services.json___*
 android/app/google-services.jsonaaa
 /flutter_*.png
 /.dart_tool/
+/ios/Flutter/Generated.xcconfig
+/ios/Flutter/flutter_export_environment.sh
 # Documentación privada - ignorar todos los .md excepto README.md
 *.md
 !README.md
