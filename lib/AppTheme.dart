@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,7 +38,7 @@ class AppTheme {
     dividerColor: dividerColor,
     cardColor: neonSurfaceCard,
     listTileTheme: ListTileThemeData(iconColor: neonAccent),
-    dialogTheme: DialogTheme(shape: dialogShape()),
+    dialogTheme: DialogThemeData(shape: dialogShape()),
     appBarTheme: AppBarTheme(
       backgroundColor: neonSurfaceCard,
       foregroundColor: Colors.white,
@@ -98,7 +99,7 @@ class AppTheme {
     unselectedWidgetColor: neonHighlight.withOpacity(0.55),
     dividerColor: dividerColor.withOpacity(0.35),
     cardColor: neonSurfaceCard,
-    dialogTheme: DialogTheme(shape: dialogShape()),
+    dialogTheme: DialogThemeData(shape: dialogShape()),
     appBarTheme: AppBarTheme(
       backgroundColor: neonSurfaceCard,
       foregroundColor: Colors.white,
