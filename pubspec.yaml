@@ -78,9 +78,6 @@ dependencies:
   paytm:
     git:
       url: https://github.com/appmeetmighty/Paytm-All-in-one-flutter-sdk.git
-  flutter_braintree_betc:
-    git:
-      url: https://github.com/appmeetmighty/flutter-braintree.git
   # PUSH NOTIFICATION
   onesignal_flutter: ^5.2.4
   # Social Login
