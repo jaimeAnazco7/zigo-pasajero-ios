@@ -8,9 +8,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier:
-          - com.zigotaxi.rider
-          - com.zigotaxi.rider.OneSignalNotificationServiceExtension
+        bundle_identifier: com.zigotaxi.rider
       vars:
         APP_STORE_APPLE_ID: 6786388541
       flutter: stable
