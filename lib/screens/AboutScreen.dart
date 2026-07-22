@@ -39,7 +39,7 @@ class AboutScreenState extends State<AboutScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(ic_app_logo, height: 150, width: 150, fit: BoxFit.cover),
+            Image.asset(ic_app_logo, height: 110, width: 110, fit: BoxFit.contain),
             SizedBox(height: 16),
             Text(mAppName, style: primaryTextStyle(size: 20)),
             SizedBox(height: 8),

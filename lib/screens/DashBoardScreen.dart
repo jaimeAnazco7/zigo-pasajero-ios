@@ -98,12 +98,11 @@ class DashBoardScreenState extends State<DashBoardScreen> {
 
   void init() async {
     getCurrentUserLocation();
-    riderIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(
-          devicePixelRatio: 2.5,
-        ),
-        Platform.isIOS ? SourceIOSIcon : SourceIcon);
-    driverIcon = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), Platform.isIOS ? DriverIOSIcon : MultipleDriver);
+    riderIcon = await mapMarkerBitmapFromAsset(SourceIcon, targetWidth: kMapPinMarkerWidth);
+    driverIcon = await mapMarkerBitmapFromAsset(
+      Platform.isIOS ? DriverIOSIcon : MultipleDriver,
+      targetWidth: kMapCarMarkerWidth,
+    );
     await getAppSettingsData();
 
     polylinePoints = PolylinePoints();
@@ -295,20 +294,8 @@ class DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   Future<BitmapDescriptor> getNetworkImageMarker(String imageUrl) async {
-    print("OPERATION111");
     final http.Response response = await http.get(Uri.parse(resolveApiMediaUrl(imageUrl)));
-    final Uint8List bytes = response.bodyBytes;
-
-    // Load the image as a codec (which includes its dimensions)
-    final ui.Codec codec = await ui.instantiateImageCodec(bytes);
-    print("OPERATION222");
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-    print("OPERATION232");
-    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
-    print("OPERATION232");
-    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
-
-    return BitmapDescriptor.fromBytes(resizedBytes);
+    return mapMarkerBitmapFromBytes(response.bodyBytes, targetWidth: kMapCarMarkerWidth);
   }
 
   Future<void> getNearByDriver({bool useExpandedRadius = false}) async {

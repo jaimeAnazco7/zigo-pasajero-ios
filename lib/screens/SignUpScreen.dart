@@ -151,7 +151,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(height: context.statusBarHeight + 16),
-                  ClipRRect(borderRadius: radius(50), child: Image.asset(ic_app_logo, width: 100, height: 100)),
+                  ClipRRect(borderRadius: radius(16), child: Image.asset(ic_app_logo, width: 96, height: 96, fit: BoxFit.contain)),
                   SizedBox(height: 16),
                   Text(language.createAccount, style: boldTextStyle(size: 22)),
                   RichText(

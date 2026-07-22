@@ -2,14 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -26,6 +30,34 @@ import '../utils/images.dart';
 import '../utils/Extensions/dataTypeExtensions.dart';
 import 'Extensions/Loader.dart';
 import 'Extensions/app_common.dart';
+
+/// Ancho de pines origen/destino en el mapa (PNG nativos ~180px salen enormes en iOS).
+const int kMapPinMarkerWidth = 72;
+
+/// Ancho de iconos de auto / conductor en el mapa.
+const int kMapCarMarkerWidth = 56;
+
+/// Carga un asset de marcador reescalado (evita pines gigantes con fromAssetImage + devicePixelRatio).
+Future<BitmapDescriptor> mapMarkerBitmapFromAsset(String assetPath, {int targetWidth = kMapPinMarkerWidth}) async {
+  final ByteData data = await rootBundle.load(assetPath);
+  final ui.Codec codec = await ui.instantiateImageCodec(
+    data.buffer.asUint8List(),
+    targetWidth: targetWidth,
+  );
+  final ui.FrameInfo frame = await codec.getNextFrame();
+  final ByteData? png = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+  frame.image.dispose();
+  return BitmapDescriptor.fromBytes(png!.buffer.asUint8List());
+}
+
+/// Reescala bytes de imagen (marcadores remotos) a un tamaño usable en el mapa.
+Future<BitmapDescriptor> mapMarkerBitmapFromBytes(Uint8List bytes, {int targetWidth = kMapCarMarkerWidth}) async {
+  final ui.Codec codec = await ui.instantiateImageCodec(bytes, targetWidth: targetWidth);
+  final ui.FrameInfo frame = await codec.getNextFrame();
+  final ByteData? png = await frame.image.toByteData(format: ui.ImageByteFormat.png);
+  frame.image.dispose();
+  return BitmapDescriptor.fromBytes(png!.buffer.asUint8List());
+}
 
 Widget dotIndicator(list, i) {
   return SizedBox(

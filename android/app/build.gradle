@@ -58,8 +58,8 @@ android {
         applicationId "com.zigotaxi.rider"
         minSdkVersion 24
         targetSdkVersion 36
-        versionCode 32
-        versionName '7.0.2'
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
         multiDexEnabled true
     }
 

@@ -1,4 +1,4 @@
-const ic_app_logo = 'images/app_images/ic_app_logo.png';
+const ic_app_logo = 'images/app_images/ic_app_logo.png'; // Logo Zigo (mismo que ic_logo_white)
 const ic_logo_white = 'images/app_images/ic_logo_white.png';
 const ic_walk1 = 'images/app_images/ic_walk1.png';
 const ic_walk2 = 'images/app_images/ic_walk2.png';

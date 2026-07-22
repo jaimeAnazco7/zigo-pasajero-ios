@@ -155,9 +155,12 @@ class NewEstimateRideListWidgetState extends State<NewEstimateRideListWidget> wi
   }
 
   void init() async {
-    sourceIcon = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), Platform.isIOS ? SourceIOSIcon : SourceIcon);
-    destinationIcon = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), DestinationIcon);
-    driverIcon = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), Platform.isIOS ? DriverIOSIcon : DriverIcon);
+    sourceIcon = await mapMarkerBitmapFromAsset(SourceIcon, targetWidth: kMapPinMarkerWidth);
+    destinationIcon = await mapMarkerBitmapFromAsset(DestinationIcon, targetWidth: kMapPinMarkerWidth);
+    driverIcon = await mapMarkerBitmapFromAsset(
+      Platform.isIOS ? DriverIOSIcon : DriverIcon,
+      targetWidth: kMapCarMarkerWidth,
+    );
     getCurrentRequest();
     if (!widget.isCurrentRequest) getNewService();
     isBooking = widget.isCurrentRequest;
@@ -1821,19 +1824,7 @@ class NewEstimateRideListWidgetState extends State<NewEstimateRideListWidget> wi
   }
 
   Future<BitmapDescriptor> getNetworkImageMarker(String imageUrl) async {
-    print("OPERATION111");
     final http.Response response = await http.get(Uri.parse(resolveApiMediaUrl(imageUrl)));
-    final Uint8List bytes = response.bodyBytes;
-
-    // Load the image as a codec (which includes its dimensions)
-    final ui.Codec codec = await ui.instantiateImageCodec(bytes);
-    print("OPERATION222");
-    final ui.FrameInfo frameInfo = await codec.getNextFrame();
-    print("OPERATION232");
-    final ByteData? byteData = await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
-    print("OPERATION232");
-    final Uint8List resizedBytes = byteData!.buffer.asUint8List();
-
-    return BitmapDescriptor.fromBytes(resizedBytes);
+    return mapMarkerBitmapFromBytes(response.bodyBytes, targetWidth: kMapCarMarkerWidth);
   }
 }
