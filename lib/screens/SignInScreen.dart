@@ -385,13 +385,17 @@ class SignInScreenState extends State<SignInScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            inkWellWidget(
-              onTap: () async {
-                googleSignIn();
-              },
-              child: socialWidgetComponent(img: ic_google),
-            ),
-            SizedBox(width: 12),
+            // En iOS: sin Google ni Sign in with Apple (Guideline 2.1 / 4 — error en iPad + botón no oficial).
+            // Login iOS: email/contraseña + OTP (teléfono).
+            if (!Platform.isIOS) ...[
+              inkWellWidget(
+                onTap: () async {
+                  googleSignIn();
+                },
+                child: socialWidgetComponent(img: ic_google),
+              ),
+              SizedBox(width: 12),
+            ],
             inkWellWidget(
               onTap: () async {
                 showDialog(
@@ -411,14 +415,6 @@ class SignInScreenState extends State<SignInScreen> {
                 child: Image.asset(ic_mobile, fit: BoxFit.cover, height: 30, width: 30),
               ),
             ),
-            if (Platform.isIOS) SizedBox(width: 12),
-            if (Platform.isIOS)
-              inkWellWidget(
-                onTap: () async {
-                  appleLoginApi();
-                },
-                child: socialWidgetComponent(img: ic_apple),
-              ),
           ],
         ),
       ],

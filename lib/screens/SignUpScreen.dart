@@ -425,13 +425,16 @@ class SignUpScreenState extends State<SignUpScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            inkWellWidget(
-              onTap: () async {
-                googleSignUp();
-              },
-              child: socialWidgetComponent(img: ic_google),
-            ),
-            SizedBox(width: 12),
+            // En iOS: sin Google (Guideline 4.8 / 2.1). Registro: email/contraseña + OTP.
+            if (!Platform.isIOS) ...[
+              inkWellWidget(
+                onTap: () async {
+                  googleSignUp();
+                },
+                child: socialWidgetComponent(img: ic_google),
+              ),
+              SizedBox(width: 12),
+            ],
             inkWellWidget(
               onTap: () async {
                 showDialog(
@@ -451,7 +454,6 @@ class SignUpScreenState extends State<SignUpScreen> {
                 child: Image.asset(ic_mobile, fit: BoxFit.cover, height: 30, width: 30),
               ),
             ),
-            if (Platform.isIOS) SizedBox(width: 12),
           ],
         ),
       ],
