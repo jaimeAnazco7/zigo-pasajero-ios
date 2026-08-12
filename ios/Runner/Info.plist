@@ -53,11 +53,11 @@
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Looking for local tcp Bonjour service</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Zigo Pasajero usa tu ubicación para elegir origen, destino y estimar tiempos de viaje.</string>
+	<string>Zigo Pasajero usa tu ubicación para sugerir tu punto de recogida, buscar conductores cercanos y estimar el tiempo de llegada. Por ejemplo, al solicitar un viaje se usa tu posición actual como origen en el mapa.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Zigo Pasajero necesita acceso a tu ubicación para mostrar tu posición actual.</string>
+	<string>Zigo Pasajero puede usar tu ubicación en segundo plano para actualizar el seguimiento del viaje y avisarte cuando el conductor se acerque. Por ejemplo, durante un viaje activo se muestra tu posición y la del conductor en el mapa aunque cambies de app.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Zigo Pasajero necesita acceso a tu ubicación para mostrar tu posición actual.</string>
+	<string>Zigo Pasajero necesita tu ubicación mientras usas la app para mostrar tu posición en el mapa, definir el origen del viaje y encontrar taxis cercanos. Por ejemplo, al abrir la pantalla de solicitud se usa tu ubicación para colocar el pin de recogida.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Zigo Pasajero necesita acceso al micrófono cuando uses el botón de voz.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
