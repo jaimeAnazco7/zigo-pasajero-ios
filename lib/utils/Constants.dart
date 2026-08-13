@@ -44,9 +44,10 @@ const GOOGLE_SIGN_IN_SERVER_CLIENT_ID = '596360016418-oi6p3q0m9c5c5r67cvcpsdp0cv
 //endregion
 
 //region Currency & country code
-const currencySymbol = '\$';
-const currencyNameConst = 'usd';
-const defaultCountry = 'IN';
+// Default Perú (Zigo). Si appsetting falla o tarda, no mostrar USD/$ por error.
+const currencySymbol = 'S/';
+const currencyNameConst = 'pen';
+const defaultCountry = 'PE';
 const digitAfterDecimal = 2;
 //endregion
 

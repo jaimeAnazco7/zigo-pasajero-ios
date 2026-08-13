@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:html/parser.dart';
@@ -385,58 +386,29 @@ Widget totalCount({String? title, num? amount, bool? isTotal = false, double? sp
 }
 
 Widget printAmountWidget({required String amount, double? size, Color? color, FontWeight? weight, TextDecoration? textDecoration}) {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    // mainAxisAlignment: MainAxisAlignment.start,
-    // crossAxisAlignment: CrossAxisAlignment.center,
-    children: appStore.currencyPosition.toString().toLowerCase().trim() == LEFT.toLowerCase().trim()
-        ? [
-            Text(
-              "${appStore.currencyCode} ",
-              // appStore.currencyPosition.toString().toLowerCase().trim() == LEFT.toLowerCase().trim() ? '${appStore.currencyCode}$amount' : '$amount ${appStore.currencyCode}',
-              // textDirection: TextDirection.LTR,
-              style: TextStyle(
-                  fontSize: size ?? textPrimarySizeGlobal,
-                  color: color ?? textPrimaryColorGlobal,
-                  fontWeight: weight ?? FontWeight.bold,
-                  fontFamily: GoogleFonts.roboto().fontFamily,
-                  decoration: textDecoration ?? TextDecoration.none),
-            ),
-            Text(
-              "$amount",
-              // appStore.currencyPosition.toString().toLowerCase().trim() == LEFT.toLowerCase().trim() ? '${appStore.currencyCode}$amount' : '$amount ${appStore.currencyCode}',
-              // textDirection: TextDirection.LTR,
-              style: TextStyle(
-                  fontSize: size ?? textPrimarySizeGlobal,
-                  color: color ?? textPrimaryColorGlobal,
-                  fontWeight: weight ?? FontWeight.bold,
-                  fontFamily: GoogleFonts.roboto().fontFamily,
-                  decoration: textDecoration ?? TextDecoration.none),
-            ),
-          ]
-        : [
-            Text(
-              "$amount ",
-              style: TextStyle(
-                  fontSize: size ?? textPrimarySizeGlobal,
-                  color: color ?? textPrimaryColorGlobal,
-                  fontWeight: weight ?? FontWeight.bold,
-                  fontFamily: GoogleFonts.roboto().fontFamily,
-                  decoration: textDecoration ?? TextDecoration.none),
-            ),
-            Text(
-              "${appStore.currencyCode}",
-              // appStore.currencyPosition.toString().toLowerCase().trim() == LEFT.toLowerCase().trim() ? '${appStore.currencyCode}$amount' : '$amount ${appStore.currencyCode}',
-              // textDirection: TextDirection.LTR,
-              style: TextStyle(
-                  fontSize: size ?? textPrimarySizeGlobal,
-                  color: color ?? textPrimaryColorGlobal,
-                  fontWeight: weight ?? FontWeight.bold,
-                  fontFamily: GoogleFonts.roboto().fontFamily,
-                  decoration: textDecoration ?? TextDecoration.none),
-            ),
-          ],
-  );
+  // Observer: si currency llega después vía appsetting, el precio se redibuja (S/ vs $).
+  return Observer(builder: (_) {
+    final isLeft = appStore.currencyPosition.toString().toLowerCase().trim() == LEFT.toLowerCase().trim();
+    final symbolStyle = TextStyle(
+      fontSize: size ?? textPrimarySizeGlobal,
+      color: color ?? textPrimaryColorGlobal,
+      fontWeight: weight ?? FontWeight.bold,
+      fontFamily: GoogleFonts.roboto().fontFamily,
+      decoration: textDecoration ?? TextDecoration.none,
+    );
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: isLeft
+          ? [
+              Text("${appStore.currencyCode} ", style: symbolStyle),
+              Text("$amount", style: symbolStyle),
+            ]
+          : [
+              Text("$amount ", style: symbolStyle),
+              Text("${appStore.currencyCode}", style: symbolStyle),
+            ],
+    );
+  });
 }
 
 Future<bool> checkPermission() async {
