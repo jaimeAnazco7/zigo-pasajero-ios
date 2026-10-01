@@ -49,6 +49,7 @@ class SignUpScreenState extends State<SignUpScreen> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController passController = TextEditingController();
   TextEditingController confirmPassController = TextEditingController();
+  TextEditingController referralCodeController = TextEditingController();
 
   FocusNode firstNameFocus = FocusNode();
   FocusNode lastNameFocus = FocusNode();
@@ -57,6 +58,7 @@ class SignUpScreenState extends State<SignUpScreen> {
   FocusNode phoneFocus = FocusNode();
   FocusNode passFocus = FocusNode();
   FocusNode confirmPass = FocusNode();
+  FocusNode referralFocus = FocusNode();
 
   bool mIsCheck = false;
   bool isAcceptedTc = false;
@@ -95,27 +97,27 @@ class SignUpScreenState extends State<SignUpScreen> {
           'password': widget.socialLogin ? widget.userName : passController.text.trim(),
           "player_id": sharedPref.getString(PLAYER_ID).validate(),
           if (widget.socialLogin) 'login_type': 'mobile',
+          if (referralCodeController.text.trim().isNotEmpty) 'passenger_referral_code': referralCodeController.text.trim().toUpperCase(),
         };
 
-        await signUpApi(req).then((value) {
-          authService
-              .signUpWithEmailPassword(getContext,
-                  mobileNumber: widget.socialLogin ? '${widget.countryCode}${widget.userName}' : '$countryCode${phoneController.text.trim()}',
-                  email: emailController.text.trim(),
-                  fName: firstController.text.trim(),
-                  lName: lastNameController.text.trim(),
-                  userName: widget.socialLogin ? widget.userName : userNameController.text.trim(),
-                  password: widget.socialLogin ? widget.userName : passController.text.trim(),
-                  userType: RIDER,
-                  isOtpLogin: widget.socialLogin)
-              .then((res) async {
-            //
-          }).catchError((e) {
+        await signUpApi(req).then((value) async {
+          try {
+            await authService.signUpWithEmailPassword(getContext,
+                mobileNumber: widget.socialLogin ? '${widget.countryCode}${widget.userName}' : '$countryCode${phoneController.text.trim()}',
+                email: emailController.text.trim(),
+                fName: firstController.text.trim(),
+                lName: lastNameController.text.trim(),
+                userName: widget.socialLogin ? widget.userName : userNameController.text.trim(),
+                password: widget.socialLogin ? widget.userName : passController.text.trim(),
+                userType: RIDER,
+                isOtpLogin: widget.socialLogin);
+          } catch (e) {
             appStore.setLoading(false);
             toast('$e');
-          });
+          }
         }).catchError((error) {
           appStore.setLoading(false);
+          toast(error.toString());
         });
       } else {
         toast(language.pleaseAcceptTermsOfServicePrivacyPolicy);
@@ -291,6 +293,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                               controller: confirmPassController,
                               focus: confirmPass,
                               autoFocus: false,
+                              nextFocus: referralFocus,
                               textFieldType: TextFieldType.PASSWORD,
                               errorThisFieldRequired: errorThisFieldRequired,
                               decoration: inputDecoration(context, label: language.confirmPassword),
@@ -304,6 +307,15 @@ class SignUpScreenState extends State<SignUpScreen> {
                           ),
                       ],
                     ),
+                  SizedBox(height: 20),
+                  AppTextField(
+                    controller: referralCodeController,
+                    focus: referralFocus,
+                    autoFocus: false,
+                    textFieldType: TextFieldType.OTHER,
+                    textCapitalization: TextCapitalization.characters,
+                    decoration: inputDecoration(context, label: 'Código de invitación (opcional)'),
+                  ),
                   SizedBox(height: 16),
                   Row(
                     children: [

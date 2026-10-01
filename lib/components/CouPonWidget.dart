@@ -1,4 +1,3 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -33,7 +32,6 @@ class CouPonWidgetState extends State<CouPonWidget> {
           appStore.setLoading(true);
           currentPage++;
           setState(() {});
-
           init();
         }
       }
@@ -42,9 +40,7 @@ class CouPonWidgetState extends State<CouPonWidget> {
   }
 
   void init() async {
-    await getCouponList(
-      page: currentPage,
-    ).then((value) {
+    await getCouponList(page: currentPage).then((value) {
       appStore.setLoading(false);
       currentPage = value.pagination!.currentPage!;
       totalPage = value.pagination!.totalPages!;
@@ -64,6 +60,18 @@ class CouPonWidgetState extends State<CouPonWidget> {
     if (mounted) super.setState(fn);
   }
 
+  String _discountLabel(CouponData data) {
+    final discount = data.discount ?? 0;
+    if (data.discountType == CHARGE_TYPE_FIXED) {
+      return '${language.get} ${appStore.currencyCode} ${discount.toStringAsFixed(digitAfterDecimal)}';
+    }
+    final max = data.maximumDiscount ?? 0;
+    if (max > 0) {
+      return '${language.get} $discount% ${language.off} (máx. ${appStore.currencyCode} ${max.toStringAsFixed(0)})';
+    }
+    return '${language.get} $discount% ${language.off}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Observer(
@@ -72,96 +80,118 @@ class CouPonWidgetState extends State<CouPonWidget> {
           children: [
             Container(
               padding: EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: Theme.of(context).cardColor, borderRadius: BorderRadius.only(topLeft: radiusCircular(defaultRadius), topRight: radiusCircular(defaultRadius))),
+              decoration: BoxDecoration(
+                color: neonBackground,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(defaultRadius),
+                  topRight: Radius.circular(defaultRadius),
+                ),
+                border: Border(
+                  top: BorderSide(color: neonAccent.withOpacity(0.35), width: 1),
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(left: 12, right: 0, top: 0),
+                    padding: EdgeInsets.only(left: 16, right: 4, top: 4),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(language.availableOffers, style: boldTextStyle()),
+                        Text(language.availableOffers, style: boldTextStyle(color: neonHighlight, size: 16)),
                         IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            size: 20,
-                          ),
-                        )
+                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(Icons.close, size: 22, color: neonHighlight),
+                        ),
                       ],
                     ),
                   ),
-                  Divider(color: Colors.grey),
+                  Divider(color: neonAccent.withOpacity(0.22), height: 1),
                   Expanded(
                     child: ListView.separated(
                       controller: scrollController,
-                      padding: EdgeInsets.zero,
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       itemCount: couponData.length,
-                      // shrinkWrap: true,
-                      // physics: NeverScrollableScrollPhysics(),
                       itemBuilder: (_, index) {
-                        CouponData data = couponData[index];
-                        return Container(
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              // border: Border.all(color: Colors.grey.shade300),
-                              boxShadow: [BoxShadow(color: Colors.black45, spreadRadius: 1, blurRadius: 1)],
-                              borderRadius: BorderRadius.circular(14)),
-                          margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
+                        final CouponData data = couponData[index];
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () {
+                            Navigator.pop(context, data.code.validate());
+                            toast(language.copied);
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: neonSurfaceCard,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: neonAccent.withOpacity(0.35), width: 1),
+                            ),
+                            padding: EdgeInsets.all(14),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    DottedBorder(
-                                      strokeCap: StrokeCap.butt,
-                                      borderType: BorderType.Oval,
-                                      strokeWidth: 2.5,
-                                      padding: EdgeInsets.all(8),
-                                      child: Text(data.code.validate(), style: boldTextStyle()),
-                                      color: primaryColor.withOpacity(0.3),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                            decoration: BoxDecoration(
+                                              color: neonBackground,
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(color: neonAccent.withOpacity(0.55)),
+                                            ),
+                                            child: Text(
+                                              data.code.validate(),
+                                              style: boldTextStyle(color: neonAccent, size: 15, letterSpacing: 0.6),
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+                                          Text(
+                                            data.title.validate(),
+                                            style: boldTextStyle(color: Colors.white, size: 14),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                     SizedBox(width: 8),
-                                    Expanded(child: Text(data.title.validate(), maxLines: 3, overflow: TextOverflow.ellipsis, style: boldTextStyle(size: 14))),
                                     MaterialButton(
-                                        onPressed: () {
-                                          String codeData = data.code!;
-                                          Navigator.pop(context, codeData);
-                                          toast(language.copied);
-                                        },
-                                        color: primaryColor,
-                                        shape: BeveledRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                                        child: Icon(Icons.content_copy, size: 18, color: Colors.white)),
+                                      minWidth: 44,
+                                      height: 44,
+                                      elevation: 0,
+                                      onPressed: () {
+                                        Navigator.pop(context, data.code.validate());
+                                        toast(language.copied);
+                                      },
+                                      color: neonAccent,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                      child: Icon(Icons.content_copy, size: 18, color: neonOnAccent),
+                                    ),
                                   ],
                                 ),
-                                // SizedBox(height: 8),
-                                Text(data.discountType == CHARGE_TYPE_FIXED ? '${language.get} ${data.discount}' : '${language.get} ${data.discount} % ${language.off}',
-                                    style: primaryTextStyle(weight: FontWeight.w500)),
-                                if (data.description != null) SizedBox(height: 8),
-                                if (data.description != null)
+                                SizedBox(height: 8),
+                                Text(
+                                  _discountLabel(data),
+                                  style: primaryTextStyle(color: neonAccent, size: 13, weight: FontWeight.w600),
+                                ),
+                                if (data.description.validate().isNotEmpty) ...[
+                                  SizedBox(height: 6),
                                   Text(
                                     data.description.validate(),
-                                    style: secondaryTextStyle(),
-                                    overflow: TextOverflow.visible,
+                                    style: secondaryTextStyle(color: neonHighlight.withOpacity(0.85), size: 12),
                                   ),
+                                ],
                               ],
                             ),
                           ),
                         );
                       },
-                      separatorBuilder: (_, index) {
-                        return SizedBox();
-                        return Divider(color: Colors.grey);
-                      },
+                      separatorBuilder: (_, __) => SizedBox(height: 10),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -169,7 +199,7 @@ class CouPonWidgetState extends State<CouPonWidget> {
               visible: appStore.isLoading,
               child: loaderWidget(),
             ),
-            if (!appStore.isLoading && couponData.isEmpty) emptyWidget()
+            if (!appStore.isLoading && couponData.isEmpty) emptyWidget(),
           ],
         );
       },

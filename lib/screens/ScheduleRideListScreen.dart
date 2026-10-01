@@ -13,6 +13,7 @@ import '../network/RestApis.dart';
 import '../utils/Colors.dart';
 import '../utils/Common.dart';
 import '../utils/Constants.dart';
+import '../utils/images.dart';
 import '../utils/Extensions/AppButtonWidget.dart';
 import '../utils/Extensions/app_common.dart';
 
@@ -52,7 +53,11 @@ class _ScheduleRideListScreenState extends State<ScheduleRideListScreen> {
         return false;
       },
       child: Scaffold(
+        backgroundColor: neonBackground,
         appBar: AppBar(
+          backgroundColor: neonBackground,
+          elevation: 0,
+          iconTheme: IconThemeData(color: neonHighlight),
           title: Text(
             "${language.schedule_list_title}",
             style: primaryTextStyle(size: 18, weight: FontWeight.bold, color: neonHighlight),
@@ -66,189 +71,190 @@ class _ScheduleRideListScreenState extends State<ScheduleRideListScreen> {
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     "🚖 ${language.schedule_list_desc}",
-                    style: secondaryTextStyle(size: 14, color: Colors.black, weight: FontWeight.bold),
+                    style: secondaryTextStyle(size: 14, color: neonHighlight.withOpacity(0.88), weight: FontWeight.w500),
                   ),
                 ),
                 Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (int i = 0; i < schedule_ride_request.length; i++)
-                          Container(
-                            width: context.width(),
-                            padding: EdgeInsets.all(8),
-                            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: primaryColor),
-                              borderRadius: BorderRadius.circular(defaultRadius),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                                        children: [
-                                          Text(
-                                            "${language.rideId}: ${schedule_ride_request[i].id}",
-                                            style: primaryTextStyle(size: 12, weight: FontWeight.bold),
-                                          ),
-                                          Text(
-                                            "${language.schedule_at}: ${DateFormat('dd MMM yyyy hh:mm a').format(DateTime.parse(schedule_ride_request[i].schedule_datetime.toString() + "Z").toLocal())}",
-                                            style: secondaryTextStyle(size: 12),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    PopupMenuButton(
-                                      itemBuilder: (context) {
-                                        return [
-                                          PopupMenuItem(
-                                            child: Text(language.cancel),
-                                            value: "cancel",
-                                          ),
-                                        ];
-                                      },
-                                      // color: Colors.white70,
-                                      shadowColor: Colors.black,
-                                      popUpAnimationStyle: AnimationStyle(curve: Curves.bounceIn, reverseCurve: Curves.bounceInOut),
-                                      borderRadius: radius(24),
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(borderRadius: radius(12)),
-                                      child: Icon(Icons.more_vert),
-                                      enabled: true,
-                                      clipBehavior: Clip.none,
-                                      onSelected: (value) {
-                                        if (value == "cancel") {
-                                          showModalBottomSheet(
-                                              context: context,
-                                              isDismissible: false,
-                                              isScrollControlled: true,
-                                              builder: (context) {
-                                                return CancelOrderDialog(
-                                                  onCancel: (reason) async {
-                                                    Navigator.pop(context);
-                                                    appStore.setLoading(true);
-                                                    sharedPref.remove(REMAINING_TIME);
-                                                    sharedPref.remove(IS_TIME);
-                                                    await cancelRequest(reason, ride_id: schedule_ride_request[i].id);
-                                                    appStore.setLoading(false);
-                                                  },
-                                                );
-                                              });
-                                        }
-                                      },
-                                    )
-                                  ],
+                  child: schedule_ride_request.isEmpty && !appStore.isLoading
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset(noDataImg, width: 140, height: 180),
+                              SizedBox(height: 12),
+                              Text(
+                                language.schedule_list_title,
+                                style: boldTextStyle(color: neonHighlight, size: 16),
+                              ),
+                              SizedBox(height: 6),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 32),
+                                child: Text(
+                                  language.schedule_list_desc,
+                                  textAlign: TextAlign.center,
+                                  style: secondaryTextStyle(color: neonHighlight.withOpacity(0.75), size: 13),
                                 ),
-                                Divider(),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.near_me, color: Colors.green, size: 18),
-                                        SizedBox(width: 8),
-                                        Expanded(child: Text(schedule_ride_request[i].startAddress.validate(), style: primaryTextStyle(size: 14), maxLines: 2)),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        SizedBox(width: 8),
-                                        SizedBox(
-                                          height: 12,
-                                          child: DottedLine(
-                                            direction: Axis.vertical,
-                                            lineLength: double.infinity,
-                                            lineThickness: 1,
-                                            dashLength: 2,
-                                            dashColor: primaryColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Icon(Icons.location_on, color: Colors.red, size: 18),
-                                        SizedBox(width: 8),
-                                        Expanded(child: Text(schedule_ride_request[i].endAddress.validate(), style: primaryTextStyle(size: 14), maxLines: 2)),
-                                      ],
-                                    ),
-                                    if (schedule_ride_request[i].multiDropLocation != null && schedule_ride_request[i].multiDropLocation!.isNotEmpty)
-                                      Row(
-                                        children: [
-                                          SizedBox(width: 8),
-                                          SizedBox(
-                                            height: 12,
-                                            child: DottedLine(
-                                              direction: Axis.vertical,
-                                              lineLength: double.infinity,
-                                              lineThickness: 1,
-                                              dashLength: 2,
-                                              dashColor: primaryColor,
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: EdgeInsets.fromLTRB(16, 4, 16, 24),
+                          itemCount: schedule_ride_request.length,
+                          itemBuilder: (context, i) {
+                            final ride = schedule_ride_request[i];
+                            DateTime? when;
+                            try {
+                              when = DateTime.parse('${ride.schedule_datetime}Z').toLocal();
+                            } catch (_) {
+                              when = null;
+                            }
+                            return Container(
+                              width: context.width(),
+                              padding: EdgeInsets.all(14),
+                              margin: EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: neonSurfaceCard,
+                                border: Border.all(color: neonAccent.withOpacity(0.45)),
+                                borderRadius: BorderRadius.circular(defaultRadius),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${language.rideId}: ${ride.id}",
+                                              style: primaryTextStyle(size: 12, weight: FontWeight.bold, color: neonHighlight.withOpacity(0.8)),
                                             ),
-                                          ),
-                                        ],
+                                            SizedBox(height: 4),
+                                            Text(
+                                              "${language.schedule_at}: ${when != null ? DateFormat('dd MMM yyyy hh:mm a').format(when) : (ride.schedule_datetime ?? '')}",
+                                              style: boldTextStyle(size: 13, color: neonAccent),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    if (schedule_ride_request[i].multiDropLocation != null && schedule_ride_request[i].multiDropLocation!.isNotEmpty)
-                                      AppButtonWidget(
-                                        textColor: primaryColor,
-                                        color: Colors.white,
+                                      PopupMenuButton(
+                                        color: neonSurfaceCard,
+                                        icon: Icon(Icons.more_vert, color: neonHighlight),
+                                        itemBuilder: (context) {
+                                          return [
+                                            PopupMenuItem(
+                                              child: Text(language.cancel, style: primaryTextStyle(color: neonHighlight)),
+                                              value: "cancel",
+                                            ),
+                                          ];
+                                        },
+                                        shape: RoundedRectangleBorder(borderRadius: radius(12)),
+                                        onSelected: (value) {
+                                          if (value == "cancel") {
+                                            showModalBottomSheet(
+                                                context: context,
+                                                isDismissible: false,
+                                                isScrollControlled: true,
+                                                backgroundColor: neonSurfaceCard,
+                                                builder: (context) {
+                                                  return CancelOrderDialog(
+                                                    onCancel: (reason) async {
+                                                      Navigator.pop(context);
+                                                      appStore.setLoading(true);
+                                                      sharedPref.remove(REMAINING_TIME);
+                                                      sharedPref.remove(IS_TIME);
+                                                      await cancelRequest(reason, ride_id: ride.id);
+                                                      appStore.setLoading(false);
+                                                    },
+                                                  );
+                                                });
+                                          }
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                  Divider(color: neonAccent.withOpacity(0.28), height: 20),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.near_me, color: neonAccent, size: 18),
+                                      SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          ride.startAddress.validate().isEmpty ? '—' : ride.startAddress.validate(),
+                                          style: primaryTextStyle(size: 14, color: neonHighlight),
+                                          maxLines: 3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 8, top: 2, bottom: 2),
+                                    child: SizedBox(
+                                      height: 14,
+                                      child: DottedLine(
+                                        direction: Axis.vertical,
+                                        lineLength: double.infinity,
+                                        lineThickness: 1,
+                                        dashLength: 2,
+                                        dashColor: neonAccent,
+                                      ),
+                                    ),
+                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.location_on, color: neonError, size: 18),
+                                      SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          ride.endAddress.validate().isEmpty ? '—' : ride.endAddress.validate(),
+                                          style: primaryTextStyle(size: 14, color: neonHighlight),
+                                          maxLines: 3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (ride.multiDropLocation != null && ride.multiDropLocation!.isNotEmpty)
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 10),
+                                      child: AppButtonWidget(
+                                        textColor: neonOnAccent,
+                                        color: neonAccent,
                                         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
-                                        // height: 30,
-                                        shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(defaultRadius), side: BorderSide(color: primaryColor)),
+                                        shapeBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(defaultRadius)),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(
-                                              Icons.add,
-                                              color: primaryColor,
-                                              size: 12,
-                                            ),
-                                            Text(
-                                              language.viewMore,
-                                              style: primaryTextStyle(size: 14),
-                                            ),
+                                            Icon(Icons.add, color: neonOnAccent, size: 12),
+                                            Text(language.viewMore, style: primaryTextStyle(size: 14, color: neonOnAccent)),
                                           ],
                                         ),
                                         onTap: () {
                                           showOnlyDropLocationsDialog(
-                                              context,
-                                              schedule_ride_request[i]
-                                                  .multiDropLocation!
-                                                  .map(
-                                                    (e) => e.address,
-                                                  )
-                                                  .toList());
+                                            context,
+                                            ride.multiDropLocation!.map((e) => e.address).toList(),
+                                          );
                                         },
-                                      )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                 ),
               ],
             ),
             Observer(builder: (context) {
-              if (!appStore.isLoading && schedule_ride_request.isEmpty) {
-                return emptyWidget();
-              }
               return Visibility(
                 visible: appStore.isLoading,
                 child: loaderWidget(),
               );
             }),
-            // Observer(builder: (context) => Visibility(visible: appStore.isLoading, child: Positioned.fill(child: loaderWidget()))),
           ],
         ),
       ),

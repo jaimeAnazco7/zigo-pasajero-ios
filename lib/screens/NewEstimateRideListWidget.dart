@@ -171,12 +171,32 @@ class NewEstimateRideListWidgetState extends State<NewEstimateRideListWidget> wi
     try {
       timer!.cancel();
     } catch (e) {}
-    await getCurrentRideRequest().then((value) {
+    await getCurrentRideRequest().then((value) async {
       serviceMarker = value.service_marker.validate();
       rideRequestData = value.rideRequest ?? value.onRideRequest;
       if (rideRequestData == null && value.schedule_ride_request!.isNotEmpty) {
         rideRequestData = value.schedule_ride_request!.first;
       }
+
+      // Programado: si el cron ya ofreció conductor, empujar a Firebase (hosting sin gRPC).
+      if (rideRequestData != null &&
+          rideRequestData!.isSchedule == 1 &&
+          rideRequestData!.status == NEW_RIDE_REQUESTED &&
+          rideRequestData!.riderequestInDriverId != null &&
+          rideRequestData!.riderequestInDriverId! > 0) {
+        try {
+          await rideService.syncDriverOffer(
+            rideId: rideRequestData!.id!,
+            riderId: rideRequestData!.riderId ?? sharedPref.getInt(USER_ID)!,
+            driverId: rideRequestData!.riderequestInDriverId!,
+            status: rideRequestData!.status ?? NEW_RIDE_REQUESTED,
+            paymentType: rideRequestData!.paymentType,
+          );
+        } catch (e) {
+          log('schedule syncDriverOffer: $e');
+        }
+      }
+
       if (value.driver != null) {
         driverData = value.driver!;
         getUserDetailLocation();
@@ -200,6 +220,12 @@ class NewEstimateRideListWidgetState extends State<NewEstimateRideListWidget> wi
               } else if (d == null) {
                 sharedPref.setString("UPDATE_CALL", DateTime.now().toString());
               }
+            });
+          } else if (rideRequestData!.isSchedule == 1 && rideRequestData!.status == NEW_RIDE_REQUESTED) {
+            // Mientras busca conductor en reserva: reconsultar API cada 8s para sincronizar oferta.
+            timer?.cancel();
+            timer = Timer.periodic(Duration(seconds: 8), (Timer t) {
+              getCurrentRequest();
             });
           } else {
             timer?.cancel();

@@ -11,6 +11,7 @@ import '../screens/RideListScreen.dart';
 import '../screens/ScheduleRideListScreen.dart';
 import '../screens/SettingScreen.dart';
 import '../screens/WalletScreen.dart';
+import '../screens/InviteFriendsScreen.dart';
 import '../utils/Colors.dart';
 import '../utils/Common.dart';
 import '../utils/Constants.dart';
@@ -130,6 +131,15 @@ class _DrawerComponentState extends State<DrawerComponent> {
               onTap: () {
                 Navigator.pop(context);
                 launchScreen(context, EmergencyContactScreen(), pageRouteAnimation: PageRouteAnimation.Slide);
+              },
+            ),
+            DrawerWidget(
+              title: 'Invita y gana',
+              iconData: ic_my_wallet,
+              icon: Ionicons.gift_outline,
+              onTap: () {
+                Navigator.pop(context);
+                launchScreen(context, InviteFriendsScreen(), pageRouteAnimation: PageRouteAnimation.Slide);
               },
             ),
             DrawerWidget(

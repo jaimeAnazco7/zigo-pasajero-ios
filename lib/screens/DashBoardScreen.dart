@@ -201,10 +201,38 @@ class DashBoardScreenState extends State<DashBoardScreen> {
           } else {
             x = value.rideRequest != null ? value.rideRequest!.id! : value.onRideRequest!.id!;
           }
+
+          // Viaje programado activo: asegurar Firebase y ofrecer conductor si el cron ya lo asignó.
+          final bool isScheduleDue = servicesListData!.isSchedule == 1;
+          if (isScheduleDue && servicesListData!.status == NEW_RIDE_REQUESTED) {
+            try {
+              final int? offeredDriver = servicesListData!.riderequestInDriverId;
+              if (offeredDriver != null && offeredDriver > 0) {
+                await rideService.syncDriverOffer(
+                  rideId: x,
+                  riderId: servicesListData!.riderId ?? sharedPref.getInt(USER_ID)!,
+                  driverId: offeredDriver,
+                  status: servicesListData!.status ?? NEW_RIDE_REQUESTED,
+                  paymentType: servicesListData!.paymentType,
+                );
+              } else {
+                await rideService.ensureRideDocument(
+                  rideId: x,
+                  riderId: servicesListData!.riderId ?? sharedPref.getInt(USER_ID)!,
+                  status: servicesListData!.status ?? NEW_RIDE_REQUESTED,
+                  paymentType: servicesListData!.paymentType,
+                );
+              }
+            } catch (e) {
+              log('schedule firebase sync: $e');
+            }
+          }
+
           QuerySnapshot<Object?> b = await rideService.checkIsRideExist(rideId: x);
-          if (b.docs.length > 0) {
+          if (b.docs.length > 0 || isScheduleDue) {
             //   Check Condition so screen looping issue not occur
             //   if Ride Not exist in firebase than don't navigate to next screen
+            //   Exception: scheduled ride due — create/sync Firebase above and continue.
             launchScreen(
               getContext,
               NewEstimateRideListWidget(

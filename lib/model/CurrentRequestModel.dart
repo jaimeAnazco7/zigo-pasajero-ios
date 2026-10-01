@@ -146,6 +146,7 @@ class OnRideRequest {
   String? driverEmail;
   String? riderEmail;
   int? regionId;
+  int? riderequestInDriverId;
   List<MultiDropLocation>? multiDropLocation;
 
   OnRideRequest({
@@ -209,6 +210,7 @@ class OnRideRequest {
     this.driverEmail,
     this.riderEmail,
     this.regionId,
+    this.riderequestInDriverId,
     this.multiDropLocation
   });
 
@@ -279,6 +281,9 @@ class OnRideRequest {
     riderEmail = json['rider_email'];
     driverEmail = json['driver_email'];
     regionId = json['region_id'];
+    riderequestInDriverId = json['riderequest_in_driver_id'] != null
+        ? int.tryParse(json['riderequest_in_driver_id'].toString())
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -348,6 +353,7 @@ class OnRideRequest {
     data['driver_email'] = this.driverEmail;
     data['rider_email'] = this.riderEmail;
     data['region_id'] = this.regionId;
+    data['riderequest_in_driver_id'] = this.riderequestInDriverId;
     return data;
   }
 }

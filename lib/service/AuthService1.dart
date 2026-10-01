@@ -16,25 +16,28 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class AuthServices {
   Future<User?> createAuthUser(String? email, String? password, bool isOtpLogin) async {
-    User? userCredential;
     try {
       if (!isOtpLogin) {
-        await _auth.createUserWithEmailAndPassword(email: email!, password: password!).then((value) {
-          userCredential = value.user!;
-        });
-      } else {
-        userCredential = _auth.currentUser;
+        final UserCredential value = await _auth.createUserWithEmailAndPassword(email: email!, password: password!);
+        return value.user;
       }
+      return _auth.currentUser;
     } on FirebaseException catch (error) {
       if (error.code == "ERROR_EMAIL_ALREADY_IN_USE" || error.code == "account-exists-with-different-credential" || error.code == "email-already-in-use") {
-        await _auth.signInWithEmailAndPassword(email: email!, password: password!).then((value) {
-          userCredential = value.user!;
-        });
-      } else {
-        toast(getMessageFromErrorCode(error));
+        try {
+          final UserCredential value = await _auth.signInWithEmailAndPassword(email: email!, password: password!);
+          return value.user;
+        } catch (e) {
+          toast(getMessageFromErrorCode(error));
+          return null;
+        }
       }
+      toast(getMessageFromErrorCode(error));
+      return null;
+    } catch (e) {
+      toast(e.toString());
+      return null;
     }
-    return userCredential;
   }
 
   Future<void> signUpWithEmailPassword(
@@ -49,57 +52,59 @@ class AuthServices {
     bool isOtpLogin = false,
   }) async {
     try {
-      createAuthUser(email, password, isOtpLogin).then((user) async {
-        if (user != null) {
-          User currentUser = user;
+      final User? user = await createAuthUser(email, password, isOtpLogin);
+      if (user == null) {
+        appStore.setLoading(false);
+        toast('No se pudo crear la sesión. Intenta iniciar sesión.');
+        return;
+      }
 
-          UserModel userModel = UserModel();
+      UserModel userModel = UserModel();
+      userModel.uid = user.uid.validate();
+      userModel.email = email;
+      userModel.contactNumber = mobileNumber.validate();
+      userModel.username = userName.validate();
+      userModel.userType = userType.validate();
+      userModel.displayName = fName.validate() + " " + lName.validate();
+      userModel.firstName = fName.validate();
+      userModel.lastName = lName.validate();
+      userModel.createdAt = Timestamp.now().toDate().toString();
+      userModel.updatedAt = Timestamp.now().toDate().toString();
+      userModel.playerId = sharedPref.getString(PLAYER_ID).validate();
+      await sharedPref.setString(UID, user.uid.validate());
 
-          /// Create user
-          userModel.uid = currentUser.uid.validate();
-          userModel.email = email;
-          userModel.contactNumber = mobileNumber.validate();
-          userModel.username = userName.validate();
-          userModel.userType = userType.validate();
-          userModel.displayName = fName.validate() + " " + lName.validate();
-          userModel.firstName = fName.validate();
-          userModel.lastName = lName.validate();
-          userModel.createdAt = Timestamp.now().toDate().toString();
-          userModel.updatedAt = Timestamp.now().toDate().toString();
-          userModel.playerId = sharedPref.getString(PLAYER_ID).validate();
-          sharedPref.setString(UID, user.uid.validate());
+      try {
+        await userService.addDocumentWithCustomId(user.uid, userModel.toJson());
+      } catch (e) {
+        log('Firestore user doc: $e');
+        // Continuar: el usuario ya existe en Laravel; no bloquear el login.
+      }
 
-          await userService.addDocumentWithCustomId(currentUser.uid, userModel.toJson()).then((value) async {
-            Map request = {
-              "email": userModel.email,
-              "password": password,
-              "player_id": sharedPref.getString(PLAYER_ID).validate(),
-              'user_type': RIDER,
-            };
-            if (isOtpLogin) {
-              appStore.setLoading(false);
-              updateProfileUid();
-              launchScreen(context, DashBoardScreen(), isNewTask: true, pageRouteAnimation: PageRouteAnimation.Slide);
-            } else {
-              await logInApi(request).then((res) async {
-                appStore.setLoading(false);
-                updateProfileUid();
-                launchScreen(context, DashBoardScreen(), isNewTask: true, pageRouteAnimation: PageRouteAnimation.Slide);
-              }).catchError((e) {
-                appStore.setLoading(false);
-                log(e.toString());
-                toast(e.toString());
-              });
-            }
-          });
-        } else {
-          appStore.setLoading(false);
-          throw 'Something went wrong';
-        }
-      });
+      if (isOtpLogin) {
+        appStore.setLoading(false);
+        updateProfileUid();
+        launchScreen(context, DashBoardScreen(), isNewTask: true, pageRouteAnimation: PageRouteAnimation.Slide);
+        return;
+      }
+
+      Map request = {
+        "email": userModel.email,
+        "password": password,
+        "player_id": sharedPref.getString(PLAYER_ID).validate(),
+        'user_type': RIDER,
+      };
+
+      await logInApi(request);
+      appStore.setLoading(false);
+      updateProfileUid();
+      launchScreen(context, DashBoardScreen(), isNewTask: true, pageRouteAnimation: PageRouteAnimation.Slide);
     } on FirebaseException catch (error) {
       appStore.setLoading(false);
       toast(getMessageFromErrorCode(error));
+    } catch (e) {
+      appStore.setLoading(false);
+      log(e.toString());
+      toast(e.toString());
     }
   }
 

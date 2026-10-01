@@ -29,6 +29,7 @@ import '../model/PaymentListModel.dart';
 import '../model/StripePayModel.dart';
 import '../utils/Extensions/dataTypeExtensions.dart';
 import '../utils/images.dart';
+import 'MercadoPagoCheckoutScreen.dart';
 
 class PaymentScreen extends StatefulWidget {
   final num? amount;
@@ -53,6 +54,7 @@ class PaymentScreenState extends State<PaymentScreen> {
       payTabsProfileId,
       payTabsServerKey,
       payTabsClientKey,
+      mercadoPagoPublicKey,
       myFatoorahToken;
 
   String? razorKey;
@@ -116,6 +118,8 @@ class PaymentScreenState extends State<PaymentScreen> {
             payTabsProfileId = element.isTest == 1 ? element.testValue!.profileId : element.liveValue!.profileId;
             payTabsClientKey = element.isTest == 1 ? element.testValue!.clientKey : element.liveValue!.clientKey;
             payTabsServerKey = element.isTest == 1 ? element.testValue!.serverKey : element.liveValue!.serverKey;
+          } else if (element.type == PAYMENT_TYPE_MERCADOPAGO) {
+            mercadoPagoPublicKey = element.isTest == 1 ? element.testValue!.publicKey : element.liveValue!.publicKey;
           } else if (element.type == PAYMENT_TYPE_MYFATOORAH) {
             myFatoorahToken = element.isTest == 1 ? element.testValue!.accessToken : element.liveValue!.accessToken;
           }
@@ -220,6 +224,21 @@ class PaymentScreenState extends State<PaymentScreen> {
       appStore.setLoading(false);
       toast(e.toString(), print: true);
     });
+  }
+
+  Future<void> mercadoPagoPayment() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MercadoPagoCheckoutScreen(
+          amount: widget.amount ?? 0,
+          publicKey: mercadoPagoPublicKey,
+        ),
+      ),
+    );
+    if (result == true && mounted) {
+      Navigator.pop(context, true);
+    }
   }
 
   Future<void> paymentConfirm() async {
@@ -555,7 +574,7 @@ class PaymentScreenState extends State<PaymentScreen> {
               } else if (selectedPaymentType == PAYMENT_TYPE_PAYTABS) {
                 payTabsPayment();
               } else if (selectedPaymentType == PAYMENT_TYPE_MERCADOPAGO) {
-                // mercadoPagoPayment();
+                mercadoPagoPayment();
               } else if (selectedPaymentType == PAYMENT_TYPE_MYFATOORAH) {
                 myFatoorahPayment();
               }

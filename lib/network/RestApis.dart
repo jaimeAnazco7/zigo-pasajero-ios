@@ -28,6 +28,7 @@ import '../model/UserDetailModel.dart';
 import '../model/WalletInfoModel.dart';
 import '../model/WalletListModel.dart';
 import '../model/WithDrawListModel.dart';
+import '../model/PassengerReferralModel.dart';
 import '../screens/SignInScreen.dart';
 import '../utils/Constants.dart';
 import '../utils/Extensions/app_common.dart';
@@ -72,6 +73,7 @@ Future<LoginResponse> signUpApi(Map request) async {
     return loginResponse;
   }).catchError((e) {
     toast(e.toString());
+    throw e;
   });
 }
 
@@ -211,6 +213,26 @@ Future<PaymentListModel> getPaymentList() async {
 
 Future<LDBaseResponse> saveWallet(Map request) async {
   return LDBaseResponse.fromJson(await handleResponse(await buildHttpResponse('save-wallet', method: HttpMethod.POST, request: request)));
+}
+
+Future<Map<String, dynamic>> mercadoPagoConfig() async {
+  return await handleResponse(await buildHttpResponse('mercadopago/config', method: HttpMethod.GET));
+}
+
+Future<Map<String, dynamic>> mercadoPagoCards() async {
+  return await handleResponse(await buildHttpResponse('mercadopago/cards', method: HttpMethod.GET));
+}
+
+Future<Map<String, dynamic>> mercadoPagoProcessPayment(Map request) async {
+  return await handleResponse(await buildHttpResponse('mercadopago/process-payment', method: HttpMethod.POST, request: request));
+}
+
+Future<Map<String, dynamic>> mercadoPagoPaySavedCard(Map request) async {
+  return await handleResponse(await buildHttpResponse('mercadopago/pay-saved-card', method: HttpMethod.POST, request: request));
+}
+
+Future<Map<String, dynamic>> mercadoPagoDeleteCard(int id) async {
+  return await handleResponse(await buildHttpResponse('mercadopago/cards-delete/$id', method: HttpMethod.POST));
 }
 
 Future<LDBaseResponse> saveSOS(Map request) async {
@@ -409,6 +431,18 @@ Future<WithDrawListModel> getWithDrawList({int? page}) async {
 
 Future<LDBaseResponse> saveWithDrawRequest(Map request) async {
   return LDBaseResponse.fromJson(await handleResponse(await buildHttpResponse('save-withdrawrequest', method: HttpMethod.POST, request: request)));
+}
+
+Future<PassengerReferralStatsModel> getPassengerReferralStats() async {
+  return PassengerReferralStatsModel.fromJson(await handleResponse(await buildHttpResponse('passenger-referral/me', method: HttpMethod.GET)));
+}
+
+Future<PassengerReferralStatsModel> applyPassengerReferralCode(String code) async {
+  return PassengerReferralStatsModel.fromJson(await handleResponse(await buildHttpResponse(
+    'passenger-referral/apply',
+    method: HttpMethod.POST,
+    request: {'passenger_referral_code': code},
+  )));
 }
 
 /// Update Bank Info

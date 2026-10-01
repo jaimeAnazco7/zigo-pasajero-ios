@@ -17,6 +17,56 @@ class RideService extends BaseService {
     return rideRef.doc("ride_$rideID").set(rideBookingModel.toJson());
   }
 
+  /// Actualiza (o crea) el doc Firebase con driver_ids para que el conductor lo vea.
+  /// Necesario en viajes programados: el hosting no escribe Firestore (sin gRPC).
+  Future<void> syncDriverOffer({
+    required int rideId,
+    required int riderId,
+    required int driverId,
+    String status = NEW_RIDE_REQUESTED,
+    String? paymentType,
+  }) async {
+    final data = <String, dynamic>{
+      'ride_id': rideId,
+      'rider_id': riderId,
+      'status': status,
+      'driver_ids': [driverId],
+      'nearby_driver_ids': [driverId],
+      'on_rider_stream_api_call': 1,
+      'on_stream_api_call': 0,
+      'payment_status': '',
+      'payment_type': paymentType ?? '',
+      'tips': 0,
+    };
+    await rideRef.doc('ride_$rideId').set(data, SetOptions(merge: true));
+    log('Firebase syncDriverOffer ride_$rideId -> driver $driverId');
+  }
+
+  /// Crea el doc mínimo del viaje si aún no existe (reserva al activarse).
+  Future<void> ensureRideDocument({
+    required int rideId,
+    required int riderId,
+    int? driverId,
+    String status = NEW_RIDE_REQUESTED,
+    String? paymentType,
+  }) async {
+    final data = <String, dynamic>{
+      'ride_id': rideId,
+      'rider_id': riderId,
+      'status': status,
+      'on_rider_stream_api_call': 1,
+      'on_stream_api_call': 0,
+      'payment_status': '',
+      'payment_type': paymentType ?? '',
+      'tips': 0,
+    };
+    if (driverId != null && driverId > 0) {
+      data['driver_ids'] = [driverId];
+      data['nearby_driver_ids'] = [driverId];
+    }
+    await rideRef.doc('ride_$rideId').set(data, SetOptions(merge: true));
+  }
+
   Stream<QuerySnapshot> fetchRide({int? rideId}) {
     print("FEETHFDJHF::${rideId}");
     return rideRef.where('ride_id', isEqualTo: rideId).snapshots();
